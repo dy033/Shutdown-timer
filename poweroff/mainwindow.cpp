@@ -36,7 +36,7 @@ void MainWindow::on_cancel_clicked()
 void MainWindow::on_ok_clicked()
 {
     int result;
-    int flag;
+    int flag,flag1=0;
     int inth,intm,ints;
     QDateTime stop_time;
     if(ui->bytimes->isChecked())
@@ -65,26 +65,57 @@ void MainWindow::on_ok_clicked()
     {
        int choose;
        choose= QMessageBox::question(this, tr("关机"),
-                                          QString(tr("确认3秒内关机？")),
+                                          QString(tr("确认3秒内关机或重启？")),
                                           QMessageBox::Yes | QMessageBox::No);
        if(choose==QMessageBox::No)
              return;
+       else
+           flag1=1;
     }
 
     QProcess p(0);
-    p.start("cmd", QStringList()<<"/c"<<"shutdown -s -t "<<plan_time);
-    if(ui->bytimes->isChecked())
-    {
-        QString tip="";
-        tip=tip+"您的电脑将于\n"+QString::number(inth)+"小时"+QString::number(intm)+"分钟"+QString::number(ints)+"秒后\n自动关机";
-        QMessageBox::information(this,tr("提示"),tip,QMessageBox::Ok);
-    }
-    else if(ui->bytime->isChecked())
-    {
-        QString tip="";
-        tip=tip+"您的电脑将于\n"+stop_time.toString("yyyy-MM-dd hh:mm:ss")+"\n自动关机";
-        QMessageBox::information(this,tr("提示"),tip,QMessageBox::Ok);
-    }
 
+    if(ui->choice->currentIndex()==0)
+    {
+        p.start("cmd", QStringList()<<"/c"<<"shutdown -f -s -t "<<plan_time);
+        p.waitForStarted();
+        p.waitForFinished();
+        if(flag1==0)
+        {
+        if(ui->bytimes->isChecked())
+        {
+            QString tip="";
+            tip=tip+"您的电脑将于\n"+QString::number(inth)+"小时"+QString::number(intm)+"分钟"+QString::number(ints)+"秒后\n自动关机";
+            QMessageBox::information(this,tr("提示"),tip,QMessageBox::Ok);
+        }
+        else if(ui->bytime->isChecked())
+        {
+            QString tip="";
+            tip=tip+"您的电脑将于\n"+stop_time.toString("yyyy-MM-dd hh:mm:ss")+"\n自动关机";
+            QMessageBox::information(this,tr("提示"),tip,QMessageBox::Ok);
+        }
+        }
+    }
+    else if(ui->choice->currentIndex()==1)
+    {
+        p.start("cmd", QStringList()<<"/c"<<"shutdown -f -r -t "<<plan_time);
+        p.waitForStarted();
+        p.waitForFinished();
+        if(flag1==0)
+        {
+        if(ui->bytimes->isChecked())
+        {
+            QString tip="";
+            tip=tip+"您的电脑将于\n"+QString::number(inth)+"小时"+QString::number(intm)+"分钟"+QString::number(ints)+"秒后\n自动重启";
+            QMessageBox::information(this,tr("提示"),tip,QMessageBox::Ok);
+        }
+        else if(ui->bytime->isChecked())
+        {
+            QString tip="";
+            tip=tip+"您的电脑将于\n"+stop_time.toString("yyyy-MM-dd hh:mm:ss")+"\n自动重启";
+            QMessageBox::information(this,tr("提示"),tip,QMessageBox::Ok);
+        }
+        }
+    }
 }
 
